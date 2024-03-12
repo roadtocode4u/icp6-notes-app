@@ -1,28 +1,22 @@
-import express from 'express';
 import cors from 'cors';
-import mongoose, {model, Schema} from 'mongoose';
 import dotenv from 'dotenv';
+import express from 'express';
+import mongoose from 'mongoose';
 dotenv.config();
+
+import Note from './models/Note.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const connectDB = async ()=>{
+const connectDB = async () => {
   await mongoose.connect(process.env.MONGODB_URL)
   console.log("Database connected")
 }
 connectDB();
 
 const PORT = 5000;
-
-const noteSchema = new Schema({
-  title: String,
-  content: String,
-  category: String
-})
-
-const Note = model("Note", noteSchema);
 
 app.get("/health", (req, res) => {
 
@@ -33,10 +27,34 @@ app.get("/health", (req, res) => {
   })
 });
 
-app.post("/notes", async(req, res)=>{
-  const {title, content, category} = req.body;
+app.post("/notes", async (req, res) => {
+  const { title, content, category } = req.body;
 
- const newNote =  await Note.create({
+  if(!title){
+    return res.json({
+      success: false,
+      message: "Title is required",
+      data: null
+    })
+  }
+
+  if(!content){
+    return res.json({
+      success: false,
+      message: "Content is required",
+      data: null
+    })
+  }
+
+  if(!category){
+    return res.json({
+      success: false,
+      message: "Category is required",
+      data: null
+    })
+  }
+
+  const newNote = await Note.create({
     "title": title,
     "content": content,
     "category": category
@@ -49,7 +67,7 @@ app.post("/notes", async(req, res)=>{
   })
 })
 
-app.get("/notes", async(req, res)=>{
+app.get("/notes", async (req, res) => {
 
   const notes = await Note.find();
 
@@ -60,12 +78,10 @@ app.get("/notes", async(req, res)=>{
   })
 })
 
-app.get("/notes/:id", async(req, res)=>{
-  const {id} = req.params;
+app.get("/notes/:id", async (req, res) => {
+  const { id } = req.params;
 
-  const note = await Note.findOne({
-    _id: id
-  })
+  const note = await Note.findById(id);
 
   res.json({
     success: true,
@@ -74,16 +90,18 @@ app.get("/notes/:id", async(req, res)=>{
   })
 })
 
-app.put("/notes/:id", async(req, res)=>{
-  const {id} = req.params;
+app.put("/notes/:id", async (req, res) => {
+  const { id } = req.params;
 
-  const {title, content, category} = req.body;
+  const { title, content, category } = req.body;
 
-  await Note.updateOne({ _id: id }, {$set: {
-    title: title,
-    content: content,
-    category: category
-  }})
+  await Note.updateOne({ _id: id }, {
+    $set: {
+      title: title,
+      content: content,
+      category: category
+    }
+  })
 
   res.json({
     success: true,
@@ -92,10 +110,10 @@ app.put("/notes/:id", async(req, res)=>{
   })
 })
 
-app.delete("/notes/:id", async(req, res)=>{
-  const {id} = req.params;
+app.delete("/notes/:id", async (req, res) => {
+  const { id } = req.params;
 
-  await Note.deleteOne({_id: id})
+  await Note.deleteOne({ _id: id })
 
   res.json({
     success: true,
