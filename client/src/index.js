@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     element: <Home />
   },
   {
-    path: "/new",
+    path: "/new-note",
     element: <NewNote />
   },
   {
