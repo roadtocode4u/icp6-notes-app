@@ -7,6 +7,8 @@ import {
 } from "react-router-dom";
 import NewNote from './views/NewNote/NewNote';
 import Home from './views/Home/Home';
+import UpdateNote from './views/UpdateNote/UpdateNote';
+import { Toaster } from 'react-hot-toast';
 
 const router = createBrowserRouter([
   {
@@ -16,10 +18,18 @@ const router = createBrowserRouter([
   {
     path: "/new",
     element: <NewNote />
+  },
+  {
+    path: "/update/:id",
+    element: <UpdateNote />
   }
 ]);
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-root.render(<RouterProvider router={router} />);
+root.render(<>
+<Toaster />
+<RouterProvider router={router} />
+</>
+);
